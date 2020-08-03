@@ -31,8 +31,15 @@
       <link rel="stylesheet" href="views/bower_components/bootstrap/dist/css/bootstrap.min.css">
       <!-- Font Awesome -->
       <link rel="stylesheet" href="views/bower_components/font-awesome/css/font-awesome.min.css">
-      <!-- Google Font ----------------------------------->
+      <!-- Google Font -->
       <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
+      <!-- DataTables -->
+      <link rel="stylesheet" href="views/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
+      <link rel="stylesheet" href="views/bower_components/datatables.net-bs/css/responsive.bootstrap.min.css">
+      <!-- Daterange picker -->
+      <link rel="stylesheet" href="views/bower_components/bootstrap-daterangepicker/daterangepicker.css">
+      <!-- Morris chart -->
+      <link rel="stylesheet" href="views/bower_components/morris.js/morris.css">  
       
       
       <!-- Javascript Plugins -->
@@ -58,6 +65,20 @@
       <script src="views/plugins/input-mask/jquery.inputmask.js"></script>
       <script src="views/plugins/input-mask/jquery.inputmask.date.extensions.js"></script>
       <script src="views/plugins/input-mask/jquery.inputmask.extensions.js"></script>
+      <!-- jQuery Number -->
+      <script src="views/plugins/jQueryNo/jQueryNo.min.js"></script>
+      <!-- daterangepicker -->
+      <!-- http://www.daterangepicker.com official website -->
+      <script src="views/bower_components/moment/min/moment.min.js"></script>
+      <script src="views/bower_components/bootstrap-daterangepicker/daterangepicker.js"></script>
+      <!-- Morris.js charts-->
+      <!-- http://morrisjs.github.io/morris.js/ -->
+      <script src="views/bower_components/raphael/raphael.min.js"></script>
+      <script src="views/bower_components/morris.js/morris.min.js"></script>
+      <!-- ChartJS -->
+      <!-- http://www.chartjs.org/-->
+      <script src="views/bower_components/chart.js/Chart.js"></script>
+      
       
     </head>
 
@@ -83,7 +104,7 @@
                   $_GET["route"] == 'customers' ||
                   $_GET["route"] == 'open-tables' ||
                   $_GET["route"] == 'sales' ||
-                  $_GET["route"] == 'sales-manager' ||
+                  $_GET["route"] == 'resale' ||
                   $_GET["route"] == 'reopen-table' ||
                   $_GET["route"] == 'reports' ||
                   $_GET["route"] == 'till' ||
@@ -116,6 +137,9 @@
       <script src="views/javascript/products.js"></script>
       <script src="views/javascript/sales.js"></script>
       <script src="views/javascript/customers.js"></script>
+      <script src="views/javascript/reports.js"></script>
+      <script src="views/javascript/opentables.js"></script>
+
 
     </body>
 

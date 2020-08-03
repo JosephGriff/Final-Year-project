@@ -1,3 +1,18 @@
+<?php
+
+if($_SESSION["profile"] == "manager"){
+
+  echo '<script>
+
+    window.location = "dashboard";
+
+  </script>';
+
+  return;
+
+}
+
+?>
 <div class="content-wrapper">
 
   <section class="content-header">
@@ -68,7 +83,8 @@
                       <td>'.$value["email"].'</td>
                       <td>'.$value["mobile"].'</td>
                       <td>'.$value["dob"].'</td>   
-                      <td>'.$value["discount"].'</td>        
+                      <td>'.$value["discount"].'</td> 
+                      <td>'.$value["purchases"].'</td>       
                       <td>'.$value["lastPurchase"].'</td>
                       <td>'.$value["registerDate"].'</td>
 
@@ -76,11 +92,15 @@
 
                         <div class="btn-group">
                             
-                          <button class="btn btn-warning btnEditCustomer" data-toggle="modal" data-target="#modEditCustomer" idCustomer="'.$value["id"].'"><i class="fa fa-pencil"></i></button>
+                          <button class="btn btn-warning btnEditCustomer" data-toggle="modal" data-target="#modEditCustomer" idCustomer="'.$value["id"].'"><i class="fa fa-pencil"></i></button>';
 
-                          <button class="btn btn-danger btnDeleteCustomer" idCustomer="'.$value["id"].'"><i class="fa fa-times"></i></button>
 
-                        </div>  
+                          if ($_SESSION["profile"] == "administrator") {
+
+                          echo '<button class="btn btn-danger btnDeleteCustomer" idCustomer="'.$value["id"].'"><i class="fa fa-times"></i></button>';
+                          }
+
+                        echo '</div>  
 
                       </td>
 
@@ -182,7 +202,7 @@
               <div class="input-group">
 
                 <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-                <input class="form-control input-lg" type="text" name="newDob" placeholder="Date of Birth" data-inputmask="'alias': 'yyyy/mm/dd'" data-mask required>
+                <input class="form-control input-lg" type="text" name="newDob" placeholder="yyyy/mm/dd" data-inputmask="'alias': 'yyyy/mm/dd'" data-mask required>
 
               </div>
 
@@ -306,7 +326,7 @@
               <div class="input-group">
 
                 <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-                <input class="form-control input-lg" type="text" name="editDob" id="editDob" data-inputmask="'alias': 'yyyy/mm/dd'" data-mask required>
+                <input class="form-control input-lg" type="text" name="editDob" id="editDob" placeholder="yyyy/mm/dd" data-inputmask="'alias': 'yyyy/mm/dd'" data-mask required>
 
               </div>
 

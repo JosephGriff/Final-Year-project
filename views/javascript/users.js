@@ -1,7 +1,6 @@
 $(document).on("click", ".btnEditUser", function(){
 
     var idUser = $(this).attr("idUser");
-	// console.log("answer", idUser);
 	var data = new FormData();
 	
     data.append("idUser", idUser);
@@ -35,22 +34,21 @@ $(document).on("click", ".btnEditUser", function(){
 });
 
 // Activate or Deactivate User
-
 $(document).on("click", ".btnActivate", function(){
 
 	var userId = $(this).attr("userId");
 	var userStatus = $(this).attr("userStatus");
 
-	var datum = new FormData();
+	var data = new FormData();
 
- 	datum.append("activateId", userId);
-  	datum.append("activateUser", userStatus);
+	data.append("activateId", userId);
+	data.append("activateUser", userStatus);
 
   	$.ajax({
 
 	  url:"ajax/users.ajax.php",
 	  method: "POST",
-	  data: datum,
+	  data: data,
 	  cache: false,
       contentType: false,
       processData: false,
@@ -138,7 +136,6 @@ $("#newUser").change(function(){
 });
 
 // Delete User
-
 $(document).on("click", ".btnDeleteUser", function(){
 
 	var userId = $(this).attr("userId");

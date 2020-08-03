@@ -1,3 +1,19 @@
+<?php
+
+if($_SESSION["profile"] == "staff"){
+
+  echo '<script>
+
+    window.location = "dashboard";
+
+  </script>';
+
+  return;
+
+}
+
+?>
+
 <div class="content-wrapper">
 
   <section class="content-header">
@@ -43,6 +59,8 @@
 
         </table>
 
+        <input type="hidden" value="<?php echo $_SESSION['profile']; ?>" id="hiddenProfile">
+
       </div>
     
     </div>
@@ -78,7 +96,7 @@
 
                 <span class="input-group-addon"><i class="fa fa-th"></i></span>
 
-                <select class="form-control input-lg" id="newCategory" name="newCategory">
+                <select class="form-control input-lg" id="newCategory" name="newCategory" required>
 
                   <option value="">Select Category</option>
 
@@ -87,13 +105,14 @@
                     $item = null;
                     $value1 = null;
 
-                    $categories = controllerCategories::ShowCategoriesController($item, $value1);
-
-                    foreach ($categories as $key => $value) {
-                      
-                      echo '<option value="'.$value["id"].'">'.$value["Category"].'</option>';
-                    }
-
+                    $categories = ControllerCategories::ShowCategoriesController($item, $value1);
+                  
+                    foreach ($categories as $key => $value):
+                  ?>
+                      <option value="<?= $value["id"] ?>" data-vat="<?= $value["Vat"] ?>" data-tax="<?= $value["Tax"] ?>" ><?= $value["Category"] ?></option>
+                    
+                  <?php
+                    endforeach;
                   ?>
 
                 </select>
@@ -108,7 +127,7 @@
 
                 <span class="input-group-addon"><i class="fa fa-code"></i></span>
 
-                <input class="form-control input-lg" type="text" id="newCode" name="newCode" placeholder="Add Code" required readonly>
+                <input class="form-control input-lg" type="text" id="newCode" name="newCode" placeholder="Add Code" required>
 
               </div>
 
@@ -120,7 +139,7 @@
 
                 <span class="input-group-addon"><i class="fa fa-product-hunt"></i></span>
 
-                <input class="form-control input-lg" type="text" id="newProduct" name="newProduct" placeholder="Add Product" required>
+                <input class="form-control input-lg" type="text" id="newDescription" name="newDescription" placeholder="Add Product" required>
 
               </div>
 
@@ -147,11 +166,32 @@
                   <span class="input-group-addon"><i class="fa fa-arrow-up"></i></span> 
 
                   <input type="number" class="form-control input-lg" id="newBuyingPrice" name="newBuyingPrice" step="any" min="0" placeholder="Buying price" required>
+                  <input type="hidden" class="form-control input-lg" id="newVatPrice" name="newVatPrice" step="any" min="0" value="" required>
+                  <input type="hidden" class="form-control input-lg" id="newTaxPrice" name="newTaxPrice" step="any" min="0" value="" required>
 
                 </div>
 
               </div>
 
+              <div class="col-xs-12 col-sm-6">  
+
+                <div class="input-group"> 
+
+                  <span class="input-group-addon"><i class="fa fa-arrow-down"></i></span> 
+
+                  <input type="number" class="form-control input-lg" id="newBuyingPricePlus" name="newBuyingPricePlus" step="any" min="0" placeholder="Selling price" required>
+
+                </div>
+
+              </div>
+
+            </div> 
+
+            <br>
+
+            <div class="form-group row">
+
+              <!-- INPUT SELLING PRICE -->
               <div class="col-xs-12 col-sm-6">  
 
                 <div class="input-group"> 
@@ -164,6 +204,7 @@
 
                 <br>
 
+                <!-- CHECKBOX PERCENTAGE -->
                 <div class="col-xs-6"> 
 
                   <div class="form-group">   
@@ -172,7 +213,7 @@
 
                       <input type="checkbox" class="minimal percentage" checked>
 
-                      VAT
+                      Markup
 
                     </label>
 
@@ -180,6 +221,7 @@
 
                 </div>
 
+                <!-- INPUT PERCENTAGE -->
                 <div class="col-xs-6" style="padding:0">
 
                   <div class="input-group"> 
@@ -212,7 +254,7 @@
 
       <?php
 
-          $addProduct = new productsController();
+          $addProduct = new ProductsController();
           $addProduct -> AddProductsController();
 
       ?>
@@ -244,14 +286,15 @@
         <div class="modal-body">
 
           <div class="box-body">
-
+            
+            <!-- Edit Product -->
             <div class="form-group">
 
               <div class="input-group">
 
                 <span class="input-group-addon"><i class="fa fa-th"></i></span>
 
-                <select class="form-control input-lg"  name="editCategory" readonly required>
+                <select class="form-control input-lg"  name="editCategory" required>
 
                   <option id="editCategory"></option>
 
@@ -260,19 +303,21 @@
               </div>
 
             </div>
-
+            
+            <!-- Edit Code -->
             <div class="form-group">
 
               <div class="input-group">
 
                 <span class="input-group-addon"><i class="fa fa-code"></i></span>
 
-                <input class="form-control input-lg" type="text" id="editCode" name="editCode" required readonly>
+                <input class="form-control input-lg" type="text" id="editCode" name="editCode" required>
 
               </div>
 
             </div>
 
+            <!-- Edit Product -->
             <div class="form-group">
 
               <div class="input-group">
@@ -285,18 +330,20 @@
 
             </div>
 
+            <!-- Edit Stock -->
             <div class="form-group">
 
               <div class="input-group">
 
                 <span class="input-group-addon"><i class="fa fa-check"></i></span>
 
-                <input class="form-control input-lg" type="number" id="editStock" name="editStock" min="0" required>
+                <input class="form-control input-lg" type="number" id="editStock" name="editStock" placeholder="Stock" required>
 
               </div>
 
             </div>
 
+            <!-- Edit Buying Price -->
             <div class="form-group row">
 
               <div class="col-xs-12 col-sm-6">
@@ -305,8 +352,9 @@
 
                   <span class="input-group-addon"><i class="fa fa-arrow-up"></i></span> 
 
-                  <input type="number" class="form-control input-lg" id="editBuyingPrice" name="editBuyingPrice" step="any" min="0" required>
-
+                  <input type="number" class="form-control input-lg" id="editBuyingPrice" name="editBuyingPrice" step="any" min="0" placeholder="Buying price">
+                  <input type="hidden" class="form-control input-lg" id="newVatPrice" name="newVatPrice" step="any" min="0" value="" required>
+                  <input type="hidden" class="form-control input-lg" id="newTaxPrice" name="newTaxPrice" step="any" min="0" value="" required>
                 </div>
 
               </div>
@@ -317,12 +365,32 @@
 
                   <span class="input-group-addon"><i class="fa fa-arrow-down"></i></span> 
 
-                  <input type="number" class="form-control input-lg" id="editSellingPrice" name="editSellingPrice" step="any" min="0" readonly required>
+                  <input type="number" class="form-control input-lg" id="editBuyingPricePlus" name="editBuyingPricePlus" step="any" min="0"y required>
+
+                </div>
+
+              </div>
+
+            </div> 
+
+            <br>
+
+            <div class="form-group row">
+
+              <!-- INPUT SELLING PRICE -->
+              <div class="col-xs-12 col-sm-6">  
+
+                <div class="input-group"> 
+
+                  <span class="input-group-addon"><i class="fa fa-arrow-down"></i></span> 
+
+                  <input type="number" class="form-control input-lg" id="editSellingPrice" name="editSellingPrice" step="any" min="0" placeholder="Selling price" required>
 
                 </div> 
 
                 <br>
 
+                <!-- CHECKBOX PERCENTAGE -->
                 <div class="col-xs-6"> 
 
                   <div class="form-group">   
@@ -331,7 +399,7 @@
 
                       <input type="checkbox" class="minimal percentage" checked>
 
-                      VAT
+                      Markup
 
                     </label>
 
@@ -339,6 +407,7 @@
 
                 </div>
 
+                <!-- INPUT PERCENTAGE -->
                 <div class="col-xs-6" style="padding:0">
 
                   <div class="input-group"> 
@@ -371,7 +440,7 @@
 
       <?php
 
-        $editProduct = new productsController();
+        $editProduct = new ProductsController();
         $editProduct -> EditProductsController();
 
       ?>   
@@ -384,7 +453,7 @@
 
 <?php
 
-   $deleteProduct = new productsController();
-   $deleteProduct -> DeleteProductsController();
+  $deleteProduct = new ProductsController();
+  $deleteProduct -> DeleteProductsController();
 
  ?>   

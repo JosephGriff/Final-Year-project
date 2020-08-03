@@ -1,10 +1,19 @@
 <?php
-
+ 
+ /**
+ * Class ControllerCategories
+ * creation, displaying, editing and deletion of categories
+ */
  class ControllerCategories{
 
-    // Create Category
-	
-	static public function CreateCategoryController(){
+	// Create Category
+	/**
+	 * Creates a new category and places it in the categories table
+	 * if the category is successfully created the user will be given a success message
+	 * while if it fails the user will be given an error message
+	 * @return void
+	 */
+	public static function CreateCategoryController(){
 
 		if(isset($_POST['newCategory'])){
 
@@ -12,10 +21,11 @@
 
 				$table = 'categories';
 
-				$data = $_POST['newCategory'];
+				$data = array("category"=>$_POST["newCategory"],
+							  "vat"=>$_POST["newVat"],
+							  "tax"=>$_POST["newTax"]);
 
 				$answer = CategoriesModel::AddCategoryModel($table, $data);
-				// var_dump($answer);
 
 				if($answer == 'ok'){
 
@@ -62,9 +72,17 @@
 		}
     }
 
-    // Show Categories
-
-    static public function ShowCategoriesController($item, $value){
+	// Show Categories
+	/**
+	 * fetches the categories table from the database
+	 * then displays the contents 
+	 * 
+     * @param mixed $item
+     * @param mixed $value
+     * 
+     * @return void
+     */
+    public static function ShowCategoriesController($item, $value){
 
 		$table = "categories";
 
@@ -72,8 +90,15 @@
 
 		return $answer;
     }
-    
-    static public function EditCategoryController(){
+	
+	/**
+	 * edits the category selected if the new inputs dont contain any invalid characters
+	 * if invalid chars are present the editing will fail and the user will be given an error message
+	 * success message if edited successfully
+	 * 
+     * @return void
+     */
+    public static function EditCategoryController(){
 
 		if(isset($_POST["editCategory"])){
 
@@ -82,7 +107,9 @@
 				$table = "categories";
 
 				$data = array("Category"=>$_POST["editCategory"],
-							   "id"=>$_POST["idCategory"]);
+							   "id"=>$_POST["idCategory"],
+							   "Vat"=>$_POST["newVat"],
+							   "Tax"=>$_POST["newTax"]);
 
 				$answer = CategoriesModel::EditCategoryModel($table, $data);
 
@@ -92,7 +119,7 @@
 
 					swal({
 						  type: "success",
-						  title: "Category edited successfully",
+						  title: "Category Edited Successfully",
 						  showConfirmButton: true,
 						  confirmButtonText: "Close"
 						  }).then(function(result){
@@ -132,8 +159,13 @@
 		}
 
     }
-    
-    static public function DeleteCategoryController(){
+	
+	/**
+	 * gets the idcategory from the categories table and deletes it
+	 * success message if completed correctly , error message if not
+     * @return void
+     */
+    public static function DeleteCategoryController(){
 
 		if(isset($_GET["idCategory"])){
 
@@ -141,7 +173,6 @@
 			$data = $_GET["idCategory"];
 
 			$answer = CategoriesModel::DeleteCategoryModel($table, $data);
-			// var_dump($answer);
 
 			if($answer == "ok"){
 

@@ -1,3 +1,19 @@
+<?php
+
+if($_SESSION["profile"] == "manager"){
+
+  echo '<script>
+
+    window.location = "dashboard";
+
+  </script>';
+
+  return;
+
+}
+
+?>
+
 <div class="content-wrapper">
 
   <section class="content">
@@ -42,16 +58,22 @@
                           $item = null;
                           $value = null;
 
-                          $sales = SalesController::ShowSalesController($item, $value);
+                          $sales1 = SalesController::ShowSalesController($item, $value);
+                          $sales2 = OpenTableController::ShowTableController($item, $value);
 
-                          if(!$sales){
+                          if(!$sales1 && !$sales2){
 
                             echo '<input type="text" class="form-control" name="newSale" id="newSale" value="10001" readonly>';
                             
                           }else{
-
-                            foreach ($sales as $key => $value) {
+                            // Incrementing receipt number via number of sales and open tables
+                            foreach ($sales1 as $key => $value) {
                               
+                            }
+
+                            $val = $value;
+                            foreach ($sales2 as $key => $val) {
+                               
                             }
 
                             $code = $value["code"] + 1;
@@ -82,23 +104,21 @@
                     <!-- Customer Number -->              
                     <div class="form-group">
 
-                      <input type="hidden" name="selectCustomer" id="selectCustomer" required>
+                      <div class="input-group">
+                                      
+                        <span class="input-group-addon"><i class="fa fa-users"></i></span>
 
-                        <div class="input-group">
-                                        
-                          <span class="input-group-addon"><i class="fa fa-users"></i></span>
+                        <div id="customer_div">
 
-                          <div id="customer_div">
+                          <input type="text" onkeypress="return event.keyCode != 13" class="form-control" id="customerSearch" name="customerSearch" placeholder="Search Customer">
+              
+                          <div class="dropdown" id="results" style="display: none"></div>
 
-                            <input type="text" class="form-control" id="customerSearch" name="customerSearch" placeholder="Search Customer">
-                            
-                            <div class="dropdown" id="results" style="display: none"></div>
-
-                          </div>
-                                        
-                          <span class="input-group-addon"><button type="button" class="btn btn-default btn-xs" data-toggle="modal" data-target="#addNewCustomer" data-dismiss="modal">Add Customer</button></span>
-                                    
                         </div>
+                                      
+                        <span class="input-group-addon"><button type="button" class="btn btn-default btn-xs" data-toggle="modal" data-target="#addNewCustomer" data-dismiss="modal">Add Customer</button></span>
+                      
+                      </div>
                                 
                     </div>
 
@@ -106,8 +126,6 @@
                     <div class="form-group row newProduct"></div>
 
                     <input type="hidden" name="productsList" id="productsList">
-
-                    <button type="button" class="btn btn-default hidden-lg btnAddProduct">Products</button> <!-- Button view for tablet to switch screens -->
 
                     <hr>
 
@@ -125,7 +143,6 @@
                             <th>Total</th>
 
                           </thead>
-
 
                           <tbody>
                             
@@ -153,9 +170,9 @@
                                   
                                   <span class="input-group-addon"><i class="ion ion-social-euro"></i></span>
                                   
-                                  <input type="number" class="form-control" name="newSaleTotal" id="newSaleTotal" placeholder="00000" totalSale="" readonly required>
+                                  <input type="text" class="form-control" name="newSaleTotal" id="newSaleTotal" placeholder="00000" totalSale="" readonly required>
 
-                                  <input type="hidden" name="saleTotal" id="saleTotal" required>
+                                  <input type="hidden" name="saleTotal" id="saleTotal" required> <!-- total sale without format to save in database -->
 
                                 </div>
 
@@ -169,7 +186,64 @@
                         
                       </div>
 
-                      <hr>
+                     
+                      
+                    </div>
+
+                  
+
+                    <div class="row">
+                      
+                      <div class="col-xs-8 pull-right">
+
+                        <table class="table">
+                          
+                          <thead>
+                            
+                            <th>Cash</th>
+                            <th>Change</th>
+
+                          </thead>
+
+                          <tbody>
+                            
+                            <tr>
+                              
+                              <td style="width: 50%">
+
+                                  <div class="input-group"> 
+
+                                    <span class="input-group-addon"><i class="ion ion-social-euro"></i></span> 
+
+                                    <input type="text" class="form-control" id="newCashValue" placeholder="000000">
+
+                                  </div>
+
+                                </div>
+
+                              </td>
+
+                              <td style="width: 100%">
+
+                                  <div class="input-group">
+
+                                    <span class="input-group-addon"><i class="ion ion-social-euro"></i></span>
+
+                                    <input type="text" class="form-control" id="newCashChange" placeholder="000000" readonly>
+
+                                  </div>
+
+                                </div>
+
+                              </td>
+
+                            </tr>
+
+                          </tbody>
+
+                        </table>
+                        
+                      </div>
                       
                     </div>
 
@@ -183,12 +257,10 @@
 
                         <div class="btn-toolbar">
 
-                            <button type="submit" class="btn btn-primary pull-right" value="Cash" name="newPaymentMethod" id="newPaymentMethod" required>Cash</button>
+                            <button class="btn btn-primary pull-right" value="Cash" name="newPaymentMethod" id="newPaymentMethod" required>Cash</button>
                             <button type="submit" class="btn btn-warning pull-right" value="Card" name="newPaymentMethod" id="newPaymentMethod" required>Card</button>
                             <button type="submit" class="btn btn-danger pull-right" value="Voucher" name="newPaymentMethod" id="newPaymentMethod" required>Voucher</button>
-                            <button class="btn btn-primary" data-toggle="modal" data-target="#splitBill">Split Bill</button>
-                            <button type="submit" class="btn btn-primary pull-right">Open Table</button>
-                            <button type="submit" class="btn btn-primary pull-right">Hold</button>
+                            <button type="submit" class="btn btn-primary pull-right btnPrintOrder" data-sale-code="<?php echo $code; ?>" value="hold" name="openTable">Hold</button>
 
                         </div>
 
@@ -207,7 +279,7 @@
           <?php
 
             $saveSale = new SalesController();
-            $saveSale -> SaleController();
+            $saveSale -> CreateSaleController();
             
           ?>
 
@@ -373,60 +445,8 @@
 
 </div>
 
-<div id="splitBill" class="modal fade" role="dialog">
-  
-  <div class="modal-dialog">
-
-    <div class="modal-content">
-
-      <form role="form" method="POST">
-
-        <div class="modal-header" style="background: #3c8dbc; color: #fff">
-          
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
-          
-          <h4 class="modal-title">Slit Bill</h4>
-
-        </div>
-
-        <div class="modal-body">
-
-          <div class="box-body">
-
-            <div class="form-group">
-
-              
-
-            </div>
-
-          </div>
-
-        </div>
-
-        <div class="modal-footer">
-
-          <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
-          <button type="submit" class="btn btn-primary">Split</button>
-
-        </div>
-
-      </form>
-
-      <?php
-
-        $createCustomer = new CustomerController();
-        $createCustomer -> CreateCustomerController();
-
-      ?>
-
-    </div>
-
-  </div>
-
-</div>
-
-
 <script>
+
     $(document).on("click", ".customer_row", function () {
 
         var $number = $(this).find('.number').html();
@@ -437,7 +457,7 @@
 
         $("#customerSearch").val($number);
 
-        $("#selectCustomer").val();
+        $("#customerSearch").val();
 
         $("#newDiscountSale").val($discount);
 

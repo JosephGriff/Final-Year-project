@@ -10,26 +10,89 @@
 
   <section class="content">
 
-    <div class="box">
-      <div class="box-header with-border">
-      
-        <h3 class="box-title">Title</h3>
-        <div class="box-tools pull-right">
+    <div class ="row">
 
-          <button type="button" class="btn btn-box-tool" data-widget="collapse" data-toggle="tooltip" title="Collapse">
-            <i class="fa fa-minus"></i>
-          </button>
+      <?php
 
-        </div>
+        if($_SESSION["profile"] =="administrator"){
+
+          include "dashboard/box_views.php";
+
+        }
+
+      ?>
+    
+    </div>
+
+    <div class ="row">
+
+      <div class="col-lg-12">
+
+      <?php
+
+        if($_SESSION["profile"] =="administrator"){
+
+          include "reports/sales_graph.php";
+
+        }
+        
+      ?>
+
       </div>
 
-      <div class="box-body">
-      
+      <div class="col-lg-6">
+        
+        <?php
+
+          if($_SESSION["profile"] =="administrator"){
+
+            include "reports/bestselling_products.php";
+
+          }
+
+        ?>
+
       </div>
- 
-      <div class="box-footer">
-      
+
+      <div class="col-lg-6">
+        
+        <?php
+        
+          if($_SESSION["profile"] =="administrator"){
+
+            include "dashboard/recentlyAdded_products.php";
+
+          }
+
+        ?>
+
       </div>
+
+      <div class="col-lg-12">
+           
+        <?php
+
+        if($_SESSION["profile"] =="manager" || $_SESSION["profile"] =="staff"){
+
+           echo '<div class="box box-success">
+
+           <div class="box-header">
+
+           <h1>Welcome ' .$_SESSION["name"].'</h1>
+
+           </div>
+
+           </div>';
+
+        }
+
+        ?>
+
+    
+    </div>
+
+</div>
+
 
     </div>
 

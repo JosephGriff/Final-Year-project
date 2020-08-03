@@ -1,14 +1,26 @@
 <?php
 
 require_once 'connection.php';
+/**
+ * Class productsModel
+ */
+class ProductsModel{
 
-class productsModel{
-
-	public static function ShowProductsModel($table, $item, $value){
+	/**
+	 * displays the chosen product or displays the full table
+	 * 
+	 * @param mixed $table
+	 * @param mixed $item
+	 * @param mixed $value
+	 * @param mixed $order
+	 * 
+	 * @return void
+	 */
+	public static function ShowProductsModel($table, $item, $value, $order){
 
 		if($item != null){
 
-			$stmt = Connection::connect()->prepare("SELECT * FROM $table WHERE $item = :$item ORDER BY id DESC");
+			$stmt = Connection::connect()->prepare("SELECT * FROM $table WHERE $item = :$item ORDER BY idCategory DESC");
 
 			$stmt -> bindParam(":".$item, $value, PDO::PARAM_STR);
 
@@ -18,7 +30,7 @@ class productsModel{
 
 		}else{
 
-			$stmt = Connection::connect()->prepare("SELECT * FROM $table");
+			$stmt = Connection::connect()->prepare("SELECT * FROM $table ORDER BY $order DESC");
 
 			$stmt -> execute();
 
@@ -32,7 +44,14 @@ class productsModel{
 
     }
 
-    static public function AddProductModel($table, $data){
+	/**
+	 * adds a product to the database table using input data from the user
+     * @param mixed $table
+     * @param mixed $data
+     * 
+     * @return void
+     */
+    public static function AddProductModel($table, $data){
 
 		$stmt = Connection::connect()->prepare("INSERT INTO $table(idCategory, code, product, stock, buyingPrice, sellingPrice) VALUES (:idCategory, :code, :product, :stock, :buyingPrice, :sellingPrice)");
 
@@ -58,14 +77,21 @@ class productsModel{
 
 	}
 
-	//edit product
-	static public function EditProductModel($table, $data){
+	// Edit product
+	/**
+	 * edits product in the products table in the database using input data from the user
+	 * @param mixed $table
+	 * @param mixed $data
+	 * 
+	 * @return void
+	 */
+	public static function EditProductModel($table, $data){
 
-		$stmt = Connection::connect()->prepare("UPDATE $table SET idCategory = :idCategory, product = :product,
-		 stock = :stock, buyingPrice = :buyingPrice, sellingPrice = :sellingPrice WHERE code = :code");
+		$stmt = Connection::connect()->prepare("UPDATE $table SET code = :code, idCategory = :idCategory, product = :product,
+		 stock = :stock, buyingPrice = :buyingPrice, sellingPrice = :sellingPrice WHERE product = :product");
 
-		$stmt->bindParam(":idCategory", $data["idCategory"], PDO::PARAM_INT);
 		$stmt->bindParam(":code", $data["code"], PDO::PARAM_STR);
+		$stmt->bindParam(":idCategory", $data["idCategory"], PDO::PARAM_INT);
 		$stmt->bindParam(":product", $data["product"], PDO::PARAM_STR);
 		$stmt->bindParam(":stock", $data["stock"], PDO::PARAM_STR);
 		$stmt->bindParam(":buyingPrice", $data["buyingPrice"], PDO::PARAM_STR);
@@ -87,7 +113,14 @@ class productsModel{
 	}
 
 	//delete product
-	static public function DeleteProductModel($table, $data){
+	/**
+	 * deletes selected product in the  products table by id
+	 * @param mixed $table
+	 * @param mixed $data
+	 * 
+	 * @return void
+	 */
+	public static function DeleteProductModel($table, $data){
 
 		$stmt = Connection::connect()->prepare("DELETE FROM $table WHERE id = :id");
 
@@ -108,7 +141,16 @@ class productsModel{
 		$stmt = null;
 	}
 
-	static public function UpdateProductModel($table, $item1, $value1, $value){
+	/**
+	 * updates the product table using input data
+	 * @param mixed $table
+	 * @param mixed $item1
+	 * @param mixed $value1
+	 * @param mixed $value
+	 * 
+	 * @return void
+	 */
+	public static function UpdateProductModel($table, $item1, $value1, $value){
 
 		$stmt = Connection::connect()->prepare("UPDATE $table SET $item1 = :$item1 WHERE id = :id");
 
@@ -129,5 +171,26 @@ class productsModel{
 
 		$stmt = null;
 
+	}
+
+
+	/**
+	* displays the sum of sales as total price from the database table
+	* 
+	* @param mixed $table
+	* 
+	* @return void
+	*/
+	static public function sumOfSalesModel($table){
+
+		$stmt = Connection::connect()->prepare("SELECT SUM(sales) as totalPrice FROM $table");
+
+		$stmt -> execute();
+
+		return $stmt -> fetch();
+
+		$stmt -> close();
+
+		$stmt = null;
 	}
 }

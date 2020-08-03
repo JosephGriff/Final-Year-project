@@ -2,11 +2,23 @@
 
 require_once 'connection.php';
 
-
+/**
+ * Class ModelSales
+ */
 class ModelSales{
 	
-    // Show Sales
-	static public function ShowSalesModel($table, $item, $value){
+	// Show Sales
+	/**
+	 * displays selected sale or displays the whole table
+	 * 
+	 * 
+	 * @param mixed $table
+	 * @param mixed $item
+	 * @param mixed $value
+	 * 
+	 * @return void
+	 */
+	public static function ShowSalesModel($table, $item, $value){
 
 		if($item != null){
 
@@ -34,7 +46,15 @@ class ModelSales{
 
 	}
 
-	static public function AddSaleModel($table, $data){
+	/**
+	 * adds sale to the sales table in the database using input data
+	 * 
+	 * @param mixed $table
+	 * @param mixed $data
+	 * 
+	 * @return void
+	 */
+	public static function AddSaleModel($table, $data){
 
 		$stmt = Connection::connect()->prepare("INSERT INTO $table(code, idSeller, tableNo, idCustomer, products, netPrice, discount, totalPrice, paymentMethod) VALUES (:code, :idSeller, :tableNo, :idCustomer, :products, :netPrice, :discount, :totalPrice, :paymentMethod)");
 
@@ -63,6 +83,10 @@ class ModelSales{
 
 	}
 
+	/**
+	 * displays all sales from the sales table in the database
+	 * @return void
+	 */
 	public static function getAll () {
 
         $stmt = Connection::connect()->prepare("SELECT sales.*, customers.name AS customer FROM sales LEFT JOIN customers ON sales.idCustomer = customers.id ORDER BY id ASC");
@@ -74,7 +98,15 @@ class ModelSales{
         return $stmt->fetchAll();
 	}
 	
-	static public function ReopenSaleModel($table, $data){
+	/**
+	 * re-opens opentables and proccesses the sale
+	 * 
+	 * @param mixed $table
+	 * @param mixed $data
+	 * 
+	 * @return void
+	 */
+	public static function ReopenSaleModel($table, $data){
 
 		$stmt = Connection::connect()->prepare("UPDATE $table SET idSeller = :idSeller, tableNo = :tableNo, idCustomer = :idCustomer, products = :products, netPrice = :netPrice, discount = :discount, totalPrice = :totalPrice, paymentMethod = :paymentMethod WHERE code = :code");
 
@@ -103,7 +135,14 @@ class ModelSales{
 
 	}
 
-	static public function DeleteSalesModel($table, $data){
+	/**
+	 * deletes selected sale from the the sales table in the database by id
+	 * @param mixed $table
+	 * @param mixed $data
+	 * 
+	 * @return void
+	 */
+	public static function DeleteSalesModel($table, $data){
 
 		$stmt = Connection::connect()->prepare("DELETE FROM $table WHERE id = :id");
 
@@ -124,5 +163,88 @@ class ModelSales{
 		$stmt = null;
 
 	}
+
+	///// date ranges
+
+	/**
+	 * displays date ranges from the table from an initial date to a finaldate
+	 * 
+	 * @param mixed $table
+	 * @param mixed $initialDate
+	 * @param mixed $finalDate
+	 * 
+	 * @return void
+	 */
+	public static function DatesRangeModel($table, $initialDate, $finalDate){
+
+		if($initialDate == null){
+
+			$stmt = Connection::connect()->prepare("SELECT * FROM $table ORDER BY id ASC");
+
+			$stmt -> execute();
+
+			return $stmt -> fetchAll();	
+
+
+		}else if($initialDate == $finalDate){
+
+			$stmt = Connection::connect()->prepare("SELECT * FROM $table WHERE saledate like '%$finalDate%'");
+
+			$stmt -> bindParam(":saledate", $finalDate, PDO::PARAM_STR);
+
+			$stmt -> execute();
+
+			return $stmt -> fetchAll();
+			
+		}else{
+
+			$actualDate = new DateTime();
+			$actualDate ->add(new DateInterval("P1D"));
+			$actualDatePlusOne = $actualDate->format("Y-m-d");
+
+			$finalDate2 = new DateTime($finalDate);
+			$finalDate2 ->add(new DateInterval("P1D"));
+			$finalDatePlusOne = $finalDate2->format("Y-m-d");
+
+			if($finalDatePlusOne == $actualDatePlusOne){
+
+				$stmt = Connection::connect()->prepare("SELECT * FROM $table WHERE saledate BETWEEN '$initialDate' AND '$finalDatePlusOne'");
+
+			}else{
+
+
+				$stmt = Connection::connect()->prepare("SELECT * FROM $table WHERE saledate BETWEEN '$initialDate' AND '$finalDate'");
+
+			}
+		
+			$stmt -> execute();
+
+			return $stmt -> fetchAll();
+
+		}
+	}
+
+	//adding total sales
+
+	/**
+	 * sums the netprice as total price from the table
+	 * @param mixed $table
+	 * 
+	 * @return void
+	 */
+	public 	static function sumTotalSalesModel($table){	
+
+		$stmt = Connection::connect()->prepare("SELECT SUM(netPrice) as totalPrice FROM $table");
+
+		$stmt -> execute();
+
+		return $stmt -> fetch();
+
+		$stmt -> close();
+
+		$stmt = null;
+
+	}
+
 	
 }

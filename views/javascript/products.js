@@ -1,6 +1,10 @@
+
+var hiddenProfile = $('#hiddenProfile').val();;
+
+
 // Dynamically Populate Products Page
 $('.productsTable').DataTable({
-	"ajax": "ajax/product-table.ajax.php", 
+	"ajax": "ajax/product-table.ajax.php?hiddenProfile="+hiddenProfile, 
 	"deferRender": true,
 	"retrieve": true,
 	"processing": true
@@ -11,14 +15,20 @@ $("#newCategory").change(function(){
 
 	var idCategory = $(this).val();
 
-	var datum = new FormData();
-  	datum.append("idCategory", idCategory);
+	var data = new FormData();
+	data.append("idCategory", idCategory);
 
+  	var Vat = $(this).find(':selected').attr('data-Vat');
+  	var Tax = $(this).find(':selected').attr('data-Tax');
+	
+  	$("#newVatPrice").val(Vat);
+  	$("#newTaxPrice").val(Tax);
+  	
   	$.ajax({
 
       url:"ajax/products.ajax.php",
       method: "POST",
-      data: datum,
+      data: data,
       cache: false,
       contentType: false,
       processData: false,
@@ -28,7 +38,7 @@ $("#newCategory").change(function(){
       	if(!answer){
 
       		var newCode = idCategory+"01";
-      		$("#newCode").val(newCode);
+			$("#newCode").val(newCode);
 
       	}else{
 
@@ -42,86 +52,86 @@ $("#newCategory").change(function(){
   	})
 
 })
+var taxing = function(){
+	var vatPercent = $("#newVatPrice").val();
+	var taxPercent = $("#newTaxPrice").val();
+	var percent = Number(($("#newBuyingPrice").val()*vatPercent/100))+Number(($("#newBuyingPrice").val()*taxPercent/100))+Number($("#newBuyingPrice").val());
+	var editPercent = Number(($("#editBuyingPrice").val()*vatPercent/100))+Number(($("#editBuyingPrice").val()*taxPercent/100))+Number($("#editBuyingPrice").val());
+	$("#newBuyingPricePlus").val(percent);
+	$("#newBuyingPricePlus").prop("readonly", true);
+	$("#editBuyingPricePlus").val(editPercent);
+	$("#editBuyingPricePlus").prop("readonly",true);
+}
+
+$("#newBuyingPrice, #editBuyingPrice, #newCategory").change(function(){
+	taxing()
+})
 
 
 
-// todo: VAT calculation
-$("#newBuyingPrice, #editBuyingPrice").change(function(){
+// Markup calculation
+$("#newBuyingPricePlus, #editBuyingPricePlus").change(function(){
 
 	if($(".percentage").prop("checked")){
 
-		var vatPercent = $(".newPercentage").val();
+		var markupPercent = $(".newPercentage").val();
 		
-		var percent = Number(($("#newBuyingPrice").val()*vatPercent/100))+Number($("#newBuyingPrice").val());
+		var percent = Number(($("#newBuyingPricePlus").val()*markupPercent/100))+Number($("#newBuyingPricePlus").val());
 
-		var editPercent = Number(($("#editBuyingPrice").val()*vatPercent/100))+Number($("#editSellingPrice").val());
+		var editPercent = Number(($("#editBuyingPricePlus").val()*markupPercent/100))+Number($("#editBuyingPricePlus").val());
 
 		$("#newSellingPrice").val(percent);
-		$("#newSellingPrice").prop("readonly", true);
 
 		$("#editSellingPrice").val(editPercent);
-		$("#editSellingPrice").prop("readonly",true);
 	}
 })
 
-//changing percent
-$("#newPercentage").change(function(){
+//Changing percent
+$(".newPercentage").change(function(){
 
 	if($(".percentage").prop("checked")){
 
-		var vatPercent = $(this).val();
+		var markupPercent = $(this).val();
 		
-		var percent = Number(($("#newBuyingPrice").val()*vatPercent/100))
-		+Number($("#newBuyingPrice").val());
+		var percent = Number(($("#newBuyingPricePlus").val()*markupPercent/100))
+		+Number($("#newBuyingPricePlus").val());
 
-		var editPercent = Number(($("#editBuyingPrice").val()*vatPercent/100))
-		+Number($("#editBuyingPrice").val());
+		var editPercent = Number(($("#editBuyingPricePlus").val()*markupPercent/100))
+		+Number($("#editBuyingPricePlus").val());
 
 
 		$("#newSellingPrice").val(percent);
-		$("#newSellingPrice").prop("readonly",true);
 
 		$("#editSellingPrice").val(editPercent);
-		$("#editSellingPrice").prop("readonly",true);
 	}
 	
 })
 
-$(".percent").on("ifUnchecked",function(){
-	
-	$("#newSellingPrice").prop("readonly",false);
-	$("#editSellingPrice").prop("readonly",false);
-
-})
-
-$(".percent").on("ifChecked",function(){
-	
-	$("#newSellingPrice").prop("readonly",true);
-	$("#editSellingPrice").prop("readonly",true);
-
-})
+// Rounding numbers off
+$("#newSellingPrice").number(true, 2);
+$("#editSellingPrice").number(true, 2);
 
 //Edit product
 $(".productsTable tbody").on("click", "button.btnEditProduct", function(){
 
 	var idProduct = $(this).attr("idProduct");
-	console.log("idProduct", idProduct);
-	var datum = new FormData();
-    datum.append("idProduct", idProduct);
-	console.log("idProduct", idProduct);
+
+	var data = new FormData();
+	data.append("idProduct", idProduct);
+
 	$.ajax({
 
 		url:"ajax/products.ajax.php",
 		method: "POST",
-		data: datum,
+		data: data,
 		cache: false,
 		contentType: false,
 		processData: false,
 		dataType:"json",
 		success:function(answer){
-			console.log("answer",answer);
+
 			var categoryData = new FormData();
-			categoryData.append("idCategory", answer["id_Category"]);
+			categoryData.append("idCategory", answer["idCategory"]);
 			 
 			 $.ajax({
 				url:"ajax/categories.ajax.php",
@@ -132,10 +142,14 @@ $(".productsTable tbody").on("click", "button.btnEditProduct", function(){
 				processData: false,
 				dataType:"json",
 				success:function(answer){
-					console.log("answer", answer);
 
 					$("#editCategory").val(answer["id"]);
-					$("#editCategory").html(answer["category"]);
+					$("#editCategory").html(answer["Category"]);
+
+					$("#newVatPrice").val(answer["Vat"]);
+
+					$("#newTaxPrice").val(answer["Tax"]);
+					
 				}
 			 })
 
@@ -145,7 +159,7 @@ $(".productsTable tbody").on("click", "button.btnEditProduct", function(){
 
 			  $("#editStock").val(answer["stock"]);
 
-			  $("#editBuyingPrice").val(answer["buyingPrice"]);
+			  $("#editBuyingPricePlus").val(answer["buyingPrice"]);
 
 			  $("#editSellingPrice").val(answer["sellingPrice"]);
 
@@ -160,18 +174,16 @@ $(".productsTable tbody").on("click ", "button.btnDeleteProduct", function(){
 
 	var idProduct = $(this).attr("idProduct");
 	var code = $(this).attr("code");
-	//console.log("idProduct", idProduct);
 
 	swal({
 
 		title: 'Are you certain you want to delete the product?',
-		text: "If not you can cancel this action!",
 		type: 'warning',
 		showCancelButton: true,
 		confirmButtonColor: '#3085d6',
 		cancelButtonColor: '#d33',
 		cancelButtonText: 'Cancel',
-		confirmButtonText: 'Yes, Delete Product'
+		confirmButtonText: 'Delete'
 		}).then(function(result){
         if (result.value) {
 

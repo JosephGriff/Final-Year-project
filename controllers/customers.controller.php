@@ -1,8 +1,21 @@
 <?php
 
+/**
+ * Class CustomerController
+ * displaying, creation, editing, deletion and searching of customers
+ */
 class CustomerController{
 
-    static public function ShowCustomerController($item, $value){
+	/**
+	 * fetches data from the customers table
+	 * and displays the data
+	 * 
+     * @param mixed $item
+     * @param mixed $value
+     * 
+     * @return void
+     */
+    public static function ShowCustomerController($item, $value){
 
 		$table = "customers";
 
@@ -12,15 +25,21 @@ class CustomerController{
 
 	}
 
-	static public function CreateCustomerController(){
+	/**
+	 * creates new customers, if all inputs are valid and do not contain any invalud chars
+	 * the new customer will be created and display a success message while if anything
+	 * was entered incorrectly the user will recieve an error message
+	 * @return void
+	 */
+	public static function CreateCustomerController(){
 
 		if(isset($_POST["newCustomer"])){
 
-			if(//preg_match('/^[a-zA-Z0-9ñÑáéíóúÁÉÍÓÚ ]+$/', $_POST["newCustomer"]) &&
-			   preg_match('/^[0-9]+$/', $_POST["newId"])){ // &&
-			   //preg_match('/^[^0-9][a-zA-Z0-9_]+([.][a-zA-Z0-9_]+)*[@][a-zA-Z0-9_]+([.][a-zA-Z0-9_]+)*[.][a-zA-Z]{2,4}$/', $_POST["newEmail"]) && 
-			   //preg_match('/^[()\-0-9 ]+$/', $_POST["newMobile"]) && 
-			   //preg_match('/^[#\.\-a-zA-Z0-9 ]+$/', $_POST["newAddress"])){
+			if(preg_match('/^[a-zA-Z0-9ñÑáéíóúÁÉÍÓÚ ]+$/', $_POST["newCustomer"]) &&
+			   preg_match('/^[0-9]+$/', $_POST["newId"]) &&
+			   preg_match('/^[^0-9][a-zA-Z0-9_]+([.][a-zA-Z0-9_]+)*[@][a-zA-Z0-9_]+([.][a-zA-Z0-9_]+)*[.][a-zA-Z]{2,4}$/', $_POST["newEmail"]) && 
+			   preg_match('/^[()\-0-9 ]+$/', $_POST["newMobile"]) && 
+			   preg_match('/^[#\.\-a-zA-Z0-9 ]+$/', $_POST["newAddress"])){
 
 			   	$table = "customers";
 
@@ -80,15 +99,22 @@ class CustomerController{
 
     }
 
-    static public function EditCustomerController(){
+	/**
+	 * Edits existing customer in the customers table,
+	 * if all inputs entered to edit the customer are correct the customer will be successfully edited
+	 * and the user will get a success message while if any is input incorrectly the user will recieve
+	 * an error message
+     * @return void
+     */
+    public static function EditCustomerController(){
 
 		if(isset($_POST["editCustomer"])){
 
-			if(//preg_match('/^[a-zA-Z0-9ñÑáéíóúÁÉÍÓÚ ]+$/', $_POST["editCustomer"]) &&
-			   preg_match('/^[0-9]+$/', $_POST["editId"])){ // &&
-			   //preg_match('/^[^0-9][a-zA-Z0-9_]+([.][a-zA-Z0-9_]+)*[@][a-zA-Z0-9_]+([.][a-zA-Z0-9_]+)*[.][a-zA-Z]{2,4}$/', $_POST["editEmail"]) && 
-			   //preg_match('/^[()\-0-9 ]+$/', $_POST["editMobile"]) && 
-			   //preg_match('/^[#\.\-a-zA-Z0-9 ]+$/', $_POST["editAddress"])){
+			if(preg_match('/^[a-zA-Z0-9ñÑáéíóúÁÉÍÓÚ ]+$/', $_POST["editCustomer"]) &&
+			   preg_match('/^[0-9]+$/', $_POST["editId"]) &&
+			   preg_match('/^[^0-9][a-zA-Z0-9_]+([.][a-zA-Z0-9_]+)*[@][a-zA-Z0-9_]+([.][a-zA-Z0-9_]+)*[.][a-zA-Z]{2,4}$/', $_POST["editEmail"]) && 
+			   preg_match('/^[()\-0-9 ]+$/', $_POST["editMobile"]) && 
+			   preg_match('/^[#\.\-a-zA-Z0-9 ]+$/', $_POST["editAddress"])){
 
 			   	$table = "customers";
 
@@ -130,7 +156,7 @@ class CustomerController{
 
 					swal({
 						  type: "error",
-						  title: "Please Fill in all Customer Details",
+						  title: "Error Filling in Customer Details. Try Again !!",
 						  showConfirmButton: true,
 						  confirmButtonText: "Close"
 						  }).then(function(result){
@@ -149,7 +175,12 @@ class CustomerController{
 
     }
 
-    static public function DeleteCustomerController(){
+	/**
+	 * gets the id of the customer chosen from the customers table and deletes it
+	 * success message will be displayed after deletion
+     * @return void
+     */
+    public static function DeleteCustomerController(){
 
 		if(isset($_GET["idCustomer"])){
 
@@ -182,8 +213,15 @@ class CustomerController{
 		}
 
 	}
-    
-    static public function searchCustomer($request){
+
+    /**
+	 * sends a request to search for customer by Id
+	 * 
+     * @param mixed $request
+     * 
+     * @return void
+     */
+    public static function searchCustomer($request){
 		
         return CustomersModel::searchByNumberId($request);
     }

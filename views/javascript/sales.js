@@ -1,3 +1,12 @@
+//local stoarage variable
+if(localStorage.getItem("captureRange") != null){
+
+	$("#daterange-btn span").html(localStorage.getItem("captureRange"));
+
+}else{
+	$("#daterange-btn span").html('<i class="fa fa-calendar"></i> Date Range')
+}
+
 $('.salesTable').DataTable({
 	"ajax": "ajax/sales-table.ajax.php", 
 	"deferRender": true,
@@ -9,23 +18,36 @@ $(".salesTable tbody").on("click", "button.addProductSale", function(){
 
     var idProduct = $(this).attr("idProduct");
    
-	var datum = new FormData();
+	var data = new FormData();
 
-    datum.append("idProduct", idProduct);
+    data.append("idProduct", idProduct);
 	
 	$.ajax({
 		url:"ajax/products.ajax.php",
 		method: "POST",
-		data: datum,
+		data: data,
 		cache: false,
 		contentType: false,
 		processData: false,
 		dataType:"json",
 		success:function(answer){
 
-      	    var product = answer["product"];
+			var product = answer["product"];
+			var category = answer["idCategory"];
 			var price = answer["sellingPrice"];
 			var stock = answer["stock"];
+
+			if(stock == 0){
+
+				swal({
+					title: "Out of Stock",
+					type: "error",
+					confirmButtonText: "Close!"
+				});
+
+			  return;
+
+			}
 
           	$(".newProduct").append(
 
@@ -37,7 +59,8 @@ $(".salesTable tbody").on("click", "button.addProductSale", function(){
 	              
 	              '<span class="input-group-addon"><button type="button" class="btn btn-danger btn-xs removeProduct" idProduct="' + idProduct + '"><i class="fa fa-times"></i></button></span>'+
 
-	              '<input type="text" class="form-control newProductDescription" idProduct="' + idProduct + '" name="addProductSale" value="' + product + '" readonly required>' +
+				  '<input type="text" class="form-control newProductDescription" idProduct="' + idProduct + '" name="addProductSale" value="' + product + '" readonly required>' +
+				  '<input type="hidden" class="form-control newProductCategory" idProduct="' + idProduct + '" name="newProductCategory" value="' + category + '" readonly required>' +
 
 	            '</div>'+
 
@@ -99,19 +122,19 @@ $(".saleForm").on("click", "button.removeProduct", function(){
 
 	localStorage.setItem("removeProduct", JSON.stringify(idRemoveProduct));
 
-	//if($(".newProductTotal").children().length == 0){
+	if($(".newProduct").children().length == 0){
 
-		$("#newTotalSale").val(0);
+		$("#newSaleTotal").val(0);
 		$("#saleTotal").val(0);
-		$("#newTotalSale").attr("totalSale",0);
+		$("#newSaleTotal").attr("saleTotal",0);
 
-	//}else{
+	}else{
 
 		totalPrice()
 		listProducts()
 		lessDiscount()
 
-	//}
+	}
 
 })
 
@@ -140,10 +163,9 @@ function totalPrice(){
 
 }
 
-$("#newSaleTotal").number(true, 2); // jQuery number plugin trying to format total - not working
+$("#newSaleTotal").number(true, 2);
 
 // Sale Less Discount
-
 function lessDiscount(){
 
 	var discount = $("#newDiscountSale").val();
@@ -170,6 +192,7 @@ $("#newDiscountSale").change(function(){
 
 });
 
+// Putting sale products into json data to save in the database
 function listProducts(){
 
 	var productsList = [];
@@ -178,12 +201,15 @@ function listProducts(){
 
 	var quantity = $(".newProductQuantity");
 
+	var category = $(".newProductCategory");
+
 	var price = $(".newProductPrice");
 
 	for(var i = 0; i < product.length; i++){
 
 		productsList.push({ "id" : $(product[i]).attr("idProduct"), 
 							  "product" : $(product[i]).val(),
+							  "category" : $(category[i]).val(),
 							  "quantity" : $(quantity[i]).val(),
 							  "stock" : $(quantity[i]).attr("newStock"),
 							  "price" : $(price[i]).attr("realPrice"),
@@ -195,6 +221,7 @@ function listProducts(){
 
 }
 
+// Updating stock and adding up price when quantity changes
 $(".saleForm").on("change", "input.newProductQuantity", function(){
 
 	var price = $(this).parent().parent().children(".enterPrice").children().children(".newProductPrice");
@@ -233,32 +260,36 @@ $(".saleForm").on("change", "input.newProductQuantity", function(){
 
 })
 
+// Select Product
 $(".saleForm").on("change", "select.newProductDescription", function(){
 
 	var productName = $(this).val();
 
 	var newProductDescription = $(this).parent().parent().parent().children().children().children(".newProductDescription");
 
+	var newProductCategory = $(this).parent().parent().parent().children().children().children(".newProductCategory");
+
 	var newProductPrice = $(this).parent().parent().parent().children(".enterPrice").children().children(".newProductPrice");
 
 	var newProductQuantity = $(this).val(); // need to fetch new quantity
 
-	var datum = new FormData();
-    datum.append("productName", productName);
+	var data = new FormData();
+    data.append("productName", productName);
 
 
 	  $.ajax({
 
      	url:"ajax/products.ajax.php",
       	method: "POST",
-      	data: datum,
+      	data: data,
       	cache: false,
       	contentType: false,
       	processData: false,
       	dataType:"json",
       	success:function(answer){
       	    
-      	    $(newProductDescription).attr("idProduct", answer["id"]);
+			$(newProductDescription).attr("idProduct", answer["id"]);
+			$(newProductCategory).attr("category", answer["idCategory"]);
       	    $(newProductQuantity).attr("stock", answer["stock"]);
       	    $(newProductQuantity).attr("newStock", Number(answer["stock"])-1);
       	    $(newProductPrice).val(answer["sellingPrice"]);
@@ -276,8 +307,7 @@ $(".tables").on("click", ".btnReopenSale", function(){
 
 	var idSale = $(this).attr("idSale");
 
-	window.location = "index.php?route=reopen-table&idSale="+idSale;
-
+	window.location = "index.php?route=resale&idSale="+idSale;
 
 })
 
@@ -303,6 +333,160 @@ $(".tables").on("click", ".btnDeleteSale", function(){
   
   })
 
-// todo: Changing stock number after sale
+  $(".tables").on("click", ".btnDeleteTable", function(){
 
-// todo: Adding Products from a Device -> Switch from till screen to buttons and back
+	var idSale = $(this).attr("idSale");
+  
+	swal({
+		  title: 'Delete Table?',
+		  type: 'warning',
+		  showCancelButton: true,
+		  confirmButtonColor: '#3085d6',
+		  cancelButtonColor: '#d33',
+		  cancelButtonText: 'Cancel',
+		  confirmButtonText: 'Yes'
+		}).then(function(result){
+		  if (result.value) {
+			
+			  window.location = "open-tables";
+		  }
+  
+	})
+
+})
+
+$(".saleForm").on("change", "input#newCashValue", function(){
+	
+	var cash = $(this).val();
+
+	var change =  Number(cash) - Number($('#saleTotal').val());
+	
+	$("#newCashChange").val(change);
+	
+})
+
+$("#newCashChange").number(true, 2);
+
+//Print receipt
+$(".tables").on("click", ".btnPrintBill", function(){
+
+	var saleCode = $(this).attr("saleCode");
+
+	window.open("extensions/tcpdf/pdf/receipt.php?code="+saleCode, "_blank");
+
+})
+
+$(".tables").on("click", ".btnPrintOpenBill", function(){
+
+	var saleCode = $(this).attr("saleCode");
+
+	window.open("extensions/tcpdf/pdf/open_receipt.php?code="+saleCode, "_blank");
+
+})
+
+function food(saleCode){
+
+	window.open('extensions/tcpdf/pdf/food_order.php?code='+saleCode);
+
+}
+
+function drink(saleCode){
+
+	window.open('extensions/tcpdf/pdf/drink_order.php?code='+saleCode);
+
+}
+
+$(".saleForm").on("click", ".btnPrintOrder", function(){
+
+    var saleCode = $(this).data("sale-code");
+
+    food(saleCode);
+    drink(saleCode);
+
+})
+
+// Date ranges 
+$('#daterange-btn').daterangepicker(
+	{
+	  ranges   : {
+		'Today'       : [moment(), moment()],
+		'Yesterday'   : [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+		'Last 7 days' : [moment().subtract(6, 'days'), moment()],
+		'Last 30 days': [moment().subtract(29, 'days'), moment()],
+		'this month'  : [moment().startOf('month'), moment().endOf('month')],
+		'Last month'  : [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+	  },
+	  startDate: moment(),
+	  endDate  : moment()
+	},
+	function (start, end) {
+	  $('#daterange-btn span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+
+	 var initialDate = start.format('YYYY-MM-DD');
+	 //console.log("initialDate", initialDate);
+
+     var finalDate = end.format('YYYY-MM-DD');
+	 //console.log("finalDate", finalDate);
+
+     var captureRange = $("#daterange-btn span").html();
+   
+   	 localStorage.setItem("captureRange", captureRange);
+   	 console.log("localStorage", localStorage);
+
+   	 window.location = "index.php?route=sales&initialDate="+initialDate+"&finalDate="+finalDate;
+
+	}
+
+	
+)
+
+//clear daterange*/
+$(".daterangepicker.opensleft .range_inputs .cancelBtn").on("click", function(){
+
+	localStorage.removeItem("captureRange");
+	localStorage.clear();
+	window.location = "sales";
+})
+
+//today
+$(".daterangepicker.opensleft .ranges li").on("click", function(){
+
+	var todayButton = $(this).attr("data-range-key");
+
+	if(todayButton == "Today"){
+
+		var d = new Date();
+		
+		var day = d.getDate();
+		var month= d.getMonth()+1;
+		var year = d.getFullYear();
+
+		if(month < 10 && day > 10){
+
+			var initialDate = year+"-0"+month+"-"+day;
+			var finalDate = year+"-0"+month+"-"+day;
+
+		}else if(day < 10 && month > 10){
+
+			var initialDate = year+"-"+month+"-0"+day;
+			var finalDate = year+"-"+month+"-0"+day;
+
+		}else if(month < 10 && day < 10){
+
+			var initialDate = year+"-0"+month+"-0"+day;
+			var finalDate = year+"-0"+month+"-0"+day;
+
+		}else{
+
+			var initialDate = year+"-"+month+"-"+day;
+	    	var finalDate = year+"-"+month+"-"+day;
+
+		}	
+
+    	localStorage.setItem("captureRange", "Today");
+
+    	window.location = "index.php?route=sales&initialDate="+initialDate+"&finalDate="+finalDate;
+
+	}
+
+})

@@ -16,90 +16,83 @@
                 
                 <div class="box">
 
-                <?php
+                  <?php
+                    $id = $_GET["id"];
+                    $openSale = OpenTableController::ShowTableController('id', $id);
+                    $seller_id = $openSale["idSeller"];
+                    $seller = UserController::ShowUsersController('id', $seller_id);
+                  ?>
+                    
+                  <?php
+                    echo '
+                        <div class="form-group">
 
-                    $item = "id";
-                    $value = $_GET["idSale"];
+                          <div class="input-group">
+                            
+                            <span class="input-group-addon"><i class="fa fa-user"></i></span>
 
-                    $sale = SalesController::ShowSalesController($item, $value);
-
-                    $itemUser = "id";
-                    $valueUser = $sale["idSeller"];
-
-                    $seller = ControllerUsers::ShowUsers($itemUser, $valueUser);
-
-                    $itemCustomers = "id";
-                    $valueCustomers = $sale["idCustomer"];
-
-                    $customers = CustomerController::ShowCustomerController($itemCustomers, $valueCustomers);
-
-                    //$discountPrice = Number(1 - discount/100);
-
-	                //$totalLessDiscount = Number(totalPrice) * Number(discountPrice);
-
-                ?>
-
-                    <!-- Employee Name -->              
-                    <div class="form-group">
-
-                      <div class="input-group">
+                            <input type="text" class="form-control" name="newSeller" id="newSeller" value="' . $seller["name"] . '" readonly>
                         
-                        <span class="input-group-addon"><i class="fa fa-user"></i></span>
+                            <input type="hidden" name="idSeller" value="' . $seller["id"] . '">
 
-                        <input type="text" class="form-control" name="newSeller" id="newSeller" value="<?php echo $seller["name"]; ?>" readonly>
+                          </div>
 
-                        <input type="hidden" name="idSeller" value="<?php echo $seller["id"]; ?>">
+                        </div>';
+                    ?>
 
-                      </div>
+                    <?php
+                                                    
+                      echo '
+                        <div class="form-group">
 
-                    </div>
+                          <div class="input-group">
 
-                    <!-- Receipt Number -->
-                    <div class="form-group">
+                            <span class="input-group-addon"><i class="fa fa-key"></i></span>
 
-                      <div class="input-group">
-                        
-                        <span class="input-group-addon"><i class="fa fa-key"></i></span>
+                            <input type="text" class="form-control" id="newSale" name="reopenSale" value="' . $openSale["code"] . '" readonly>
 
-                        <input type="text" class="form-control" id="reopenSale" name="reopenSale" value="<?php echo $sale["code"]; ?>" readonly>
+                          </div>
 
-                      </div>
+                        </div>';
 
-                    </div>
 
-                    <!-- Table Number -->              
-                    <div class="form-group">
+                    ?>
 
-                      <div class="input-group">
-                        
-                        <span class="input-group-addon"><i class="fa fa-user"></i></span>
+                    <!-- Table Number -->    
+                    <?php
 
-                        <input type="text" class="form-control" name="tableNo" id="tableNo" placeholder="Table Number">
+                      echo '
+                        <div class="form-group">
 
-                      </div>
+                          <div class="input-group">
+                            
+                            <span class="input-group-addon"><i class="fa fa-user"></i></span>
 
-                    </div>
+                            <input type="text" class="form-control" name="tableNo" id="tableNo" value="' . $openSale["tableNo"] . '">
 
+                          </div>
+
+                        </div>';
+                      ?>
+                    
                     <!-- Customer Number -->              
                     <div class="form-group">
 
-                      <input type="hidden" name="selectCustomer" id="selectCustomer" required>
+                      <div class="input-group">
+                                      
+                        <span class="input-group-addon"><i class="fa fa-users"></i></span>
 
-                        <div class="input-group">
-                                        
-                          <span class="input-group-addon"><i class="fa fa-users"></i></span>
+                        <div id="customer_div">
+                          
+                          <input type="text" class="form-control" id="customerSearch" name="customerSearch" placeholder="Search Customer">
 
-                          <div id="customer_div">
-                            
-                            <input type="text" class="form-control" id="customerSearch" name="customerSearch" placeholder="Search Customer">
-                            
-                            <div class="dropdown" id="results" style="display: none"></div>
+                          <div class="dropdown" id="results" style="display: none"></div>
 
-                          </div>
-                                        
-                          <span class="input-group-addon"><button type="button" class="btn btn-default btn-xs" data-toggle="modal" data-target="#addNewCustomer" data-dismiss="modal">Add Customer</button></span>
-                                    
                         </div>
+                                      
+                        <span class="input-group-addon"><button type="button" class="btn btn-default btn-xs" data-toggle="modal" data-target="#addNewCustomer" data-dismiss="modal">Add Customer</button></span>
+                                  
+                      </div>
                                 
                     </div>
 
@@ -107,15 +100,15 @@
                     <div class="form-group row newProduct">
                       <?php
 
-                        $productList = json_decode($sale["products"], true);
+                        $productList = json_decode($openSale["products"], true);
 
                         foreach ($productList as $key => $value) {
 
                           $item = "id";
                           $valueProduct = $value["id"];
                           $order = "id";
-
-                          $answer = productsController::ShowProductsController($item, $valueProduct, $order);
+                          
+                          $answer = ProductsController::ShowProductsController($item, $valueProduct, $order);
 
                           $lastStock = $answer["stock"] + $value["quantity"];
                           
@@ -127,7 +120,7 @@
                         
                                     <span class="input-group-addon"><button type="button" class="btn btn-danger btn-xs removeProduct" idProduct="'.$value["id"].'"><i class="fa fa-times"></i></button></span>
 
-                                    <input type="text" class="form-control newProduct" idProduct="'.$value["id"].'" name="addProduct" value="'.$value["product"].'" readonly required>
+                                    <input type="text" class="form-control newProductDescription" idProduct="'.$value["id"].'" name="addProduct" value="'.$value["product"].'" readonly required>
 
                                   </div>
 
@@ -143,7 +136,7 @@
 
                                   <div class="input-group">
 
-                                    <span class="input-group-addon"><i class="ion ion-social-usd"></i></span>
+                                    <span class="input-group-addon"><i class="ion ion-social-euro"></i></span>
                            
                                     <input type="text" class="form-control newProductPrice" realPrice="'.$answer["sellingPrice"].'" name="newProductPrice" value="'.$value["totalPrice"].'" readonly required>
            
@@ -154,8 +147,7 @@
                               </div>';
                         }
 
-
-                        ?>
+                      ?>
 
                     </div>
 
@@ -184,11 +176,11 @@
 
                                 <div class="input-group">
                                   
-                                  <input type="number" class="form-control" name="newDiscountSale" id="newDiscountSale" value="<?php echo $taxPercentage; ?>" min="0">
+                                  <input type="number" class="form-control" name="newDiscountSale" id="newDiscountSale" value="<?php echo $netPrice; ?>" min="0">
 
-                                  <input type="hidden" name="newDiscountPrice" id="newDiscountPrice" value="<?php echo $sale["discount"]; ?>" required>
+                                  <input type="hidden" name="newDiscountPrice" id="newDiscountPrice" value="" required>
 
-                                  <input type="hidden" name="newNetPrice" id="newNetPrice" value="<?php echo $sale["netPrice"]; ?>" required>
+                                  <input type="hidden" name="newNetPrice" id="newNetPrice" value="<?php echo $openSale["totalPrice"]; ?>" required>
                                   
                                   <span class="input-group-addon"><i class="fa fa-percent"></i></span>
 
@@ -202,9 +194,9 @@
                                   
                                   <span class="input-group-addon"><i class="ion ion-social-euro"></i></span>
                                   
-                                  <input type="number" class="form-control" name="newSaleTotal" id="newSaleTotal" placeholder="00000" totalSale="<?php echo $sale["netPrice"]; ?>" value="<?php echo $sale["totalPrice"]; ?>" readonly required>
+                                  <input type="number" class="form-control" name="newSaleTotal" id="newSaleTotal" placeholder="00000" totalSale="<?php echo $sale["totalPrice"]; ?>" value="<?php echo $openSale["netPrice"]; ?>" readonly required>
 
-                                  <input type="hidden" name="saleTotal" id="saleTotal" value="<?php echo $sale["totalPrice"]; ?>" required>
+                                  <input type="hidden" name="saleTotal" id="saleTotal" value="<?php echo $sale["netPrice"]; ?>" required>
 
                                 </div>
 
@@ -235,9 +227,7 @@
                             <button type="submit" class="btn btn-primary pull-right" value="Cash" name="newPaymentMethod" id="newPaymentMethod" required>Cash</button>
                             <button type="submit" class="btn btn-warning pull-right" value="Card" name="newPaymentMethod" id="newPaymentMethod" required>Card</button>
                             <button type="submit" class="btn btn-danger pull-right" value="Voucher" name="newPaymentMethod" id="newPaymentMethod" required>Voucher</button>
-                            <button class="btn btn-primary" data-toggle="modal" data-target="#splitBill">Split Bill</button>
-                            <button type="submit" class="btn btn-primary pull-right">Open Table</button>
-                            <button type="submit" class="btn btn-primary pull-right">Hold</button>
+                            <button type="submit" class="btn btn-primary pull-right" value="hold" name="openTable">Hold</button>
 
                         </div>
 
@@ -255,8 +245,8 @@
 
           <?php
 
-            $reopenSale = new SalesController();
-            $reopenSale -> OpenTableController();
+            $controller = new OpenTableController();
+            $controller->ReopenTable();
             
           ?>
 
@@ -422,58 +412,6 @@
 
 </div>
 
-<div id="splitBill" class="modal fade" role="dialog">
-  
-  <div class="modal-dialog">
-
-    <div class="modal-content">
-
-      <form role="form" method="POST">
-
-        <div class="modal-header" style="background: #3c8dbc; color: #fff">
-          
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
-          
-          <h4 class="modal-title">Slit Bill</h4>
-
-        </div>
-
-        <div class="modal-body">
-
-          <div class="box-body">
-
-            <div class="form-group">
-
-              
-
-            </div>
-
-          </div>
-
-        </div>
-
-        <div class="modal-footer">
-
-          <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
-          <button type="submit" class="btn btn-primary">Split</button>
-
-        </div>
-
-      </form>
-
-      <?php
-
-        $createCustomer = new CustomerController();
-        $createCustomer -> CreateCustomerController();
-
-      ?>
-
-    </div>
-
-  </div>
-
-</div>
-
 
 <script>
     $(document).on("click", ".customer_row", function () {
@@ -486,7 +424,7 @@
 
         $("#customerSearch").val($number);
 
-        $("#selectCustomer").val();
+        $("#customerSearch").val();
 
         $("#newDiscountSale").val($discount);
 

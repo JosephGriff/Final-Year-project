@@ -1,3 +1,21 @@
+<?php
+
+if($_SESSION["profile"] == "staff"){
+
+  echo '<script>
+
+    window.location = "dashboard";
+
+  </script>';
+
+  return;
+
+}
+
+?>
+
+
+
 <div class="content-wrapper">
   
     <section class="content-header">
@@ -28,6 +46,8 @@
                
                <th style="width:10px">#</th>
                <th>Category</th>
+               <th>VAT</th>
+               <th>Tax</th>
                <th>Actions</th>
 
              </tr> 
@@ -48,15 +68,21 @@
                   echo '<tr>
                           <td>'.($key+1).'</td>
                           <td class="text-uppercase">'.$value['Category'].'</td>
+                          <td class="text-uppercase">'.$value['Vat'].'</td>
+                          <td class="text-uppercase">'.$value['Tax'].'</td>
                           <td>
 
                             <div class="btn-group">
                                 
-                              <button class="btn btn-warning btnEditCategory" idCategory="'.$value["id"].'" data-toggle="modal" data-target="#editCategories"><i class="fa fa-pencil"></i></button>
+                              <button class="btn btn-warning btnEditCategory" idCategory="'.$value["id"].'" data-toggle="modal" data-target="#editCategories"><i class="fa fa-pencil"></i></button>';
 
-                              <button class="btn btn-danger btnDeleteCategory" idCategory="'.$value["id"].'"><i class="fa fa-times"></i></button>
+                              if ($_SESSION["profile"] == "administrator") {
 
-                            </div>  
+                              echo '<button class="btn btn-danger btnDeleteCategory" idCategory="'.$value["id"].'"><i class="fa fa-times"></i></button>';
+                              
+                              }
+
+                           echo '</div>  
 
                           </td>
 
@@ -108,14 +134,36 @@
 
                         </div>
 
+                        <div class="form-group">
+
+                            <div class="input-group">
+
+                                <span class="input-group-addon"><i class="fa fa-th"></i></span>
+                                <input class="form-control input-lg" type="number" min="0" id="newVat" name="newVat" placeholder="Add VAT" required>
+
+                            </div>
+
+                        </div>
+
+                        <div class="form-group">
+
+                            <div class="input-group">
+
+                                <span class="input-group-addon"><i class="fa fa-th"></i></span>
+                                <input class="form-control input-lg" type="number" min="0" id="newTax" name="newTax" placeholder="Add Tax" required>
+
+                            </div>
+
+                        </div>
+
                     </div>
 
                 </div>
 
                 <div class="modal-footer">
 
-                    <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Save Category</button>
+                  <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+                  <button type="submit" class="btn btn-primary">Save Category</button>
 
                 </div>
 
@@ -128,8 +176,9 @@
 
 <?php
 
-$createCategory = new ControllerCategories();
-$createCategory -> CreateCategoryController();
+  $createCategory = new ControllerCategories();
+  $createCategory -> CreateCategoryController();
+
 ?>
 
 <!-- Edit Categories -->
@@ -159,6 +208,28 @@ $createCategory -> CreateCategoryController();
                 <span class="input-group-addon"><i class="fa fa-th"></i></span>
                 <input class="form-control input-lg" type="text" id="editCategory" name="editCategory" required>
                 <input type="hidden" name="idCategory" id="idCategory" required>
+
+              </div>
+
+            </div>
+
+            <div class="form-group">
+
+              <div class="input-group">
+
+                  <span class="input-group-addon"><i class="fa fa-th"></i></span>
+                  <input class="form-control input-lg" type="number" min="0" id="newVat" name="newVat" placeholder="Add VAT" required>
+
+              </div>
+
+            </div>
+
+            <div class="form-group">
+
+              <div class="input-group">
+
+                  <span class="input-group-addon"><i class="fa fa-th"></i></span>
+                  <input class="form-control input-lg" type="number" min="0" id="newTax" name="newTax" placeholder="Add Tax" required>
 
               </div>
 

@@ -1,16 +1,15 @@
 // Edit Category
-
 $(".tables").on("click", ".btnEditCategory", function(){
 
 	var idCategory = $(this).attr("idCategory");
 
-	var datum = new FormData();
-	datum.append("idCategory", idCategory);
+	var data = new FormData();
+	data.append("idCategory", idCategory);
 
 	$.ajax({
 		url: "ajax/categories.ajax.php",
 		method: "POST",
-      	data: datum,
+      	data: data,
       	cache: false,
      	contentType: false,
      	processData: false,
@@ -20,7 +19,9 @@ $(".tables").on("click", ".btnEditCategory", function(){
      		// console.log("answer", answer);
 
      		$("#editCategory").val(answer["Category"]);
-     		$("#idCategory").val(answer["id"]);
+			 $("#idCategory").val(answer["id"]);
+			 $("#Vat").val(answer["Vat"]);
+			 $("#Tax").val(answer["Tax"]);
 
      	}
 
@@ -29,7 +30,6 @@ $(".tables").on("click", ".btnEditCategory", function(){
 })
 
 // Delete Category
-
 $(".tables").on("click", ".btnDeleteCategory", function(){
 
     var idCategory = $(this).attr("idCategory");

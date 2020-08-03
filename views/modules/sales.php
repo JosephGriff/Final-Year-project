@@ -1,3 +1,18 @@
+<?php
+
+if($_SESSION["profile"] == "manager"){
+
+  echo '<script>
+
+    window.location = "dashboard";
+
+  </script>';
+
+  return;
+
+}
+
+?>
 <div class="content-wrapper">
 
   <section class="content-header">
@@ -25,6 +40,16 @@
           </button>
 
         </a>
+
+        <button type="button" class="btn btn-default pull-right" id="daterange-btn">
+           
+            <span>
+              <i class="fa fa-calendar"></i> Date Range
+            </span>
+
+            <i class="fa fa-caret-down"></i>
+
+        </button>
 
       </div>
 
@@ -56,81 +81,92 @@
           <?php
 
 
+          if(isset($_GET["initialDate"])){
 
-  $item = null;
-  $value = null;
+            $initialDate = $_GET["initialDate"];
+            $finalDate = $_GET["finalDate"];
 
+          }else{
 
-$answer = SalesController::ShowSalesController($item, $value);
+            $initialDate = null;
+            $finalDate = null;
 
-foreach ($answer as $key => $value) {
- 
+          }
 
- echo '<td>'.($key+1).'</td>
+          $answer = SalesController::salesDatesRangeController($initialDate, $finalDate);
 
-        <td>'.$value["code"].'</td>';
+            foreach ($answer as $key => $value) {
+          
 
-        $itemUser = "id";
-        $valueUser = $value["idSeller"];
+                  echo '<td>'.($key+1).'</td>
 
-        $userAnswer = ControllerUsers::ShowUsers($itemUser, $valueUser);
+                  <td>'.$value["code"].'</td>';
 
-        echo '<td>'.$userAnswer["name"].'</td>
+                  $itemUser = "id";
+                  $valueUser = $value["idSeller"];
 
-        <td>'.$value["tableNo"].'</td>';
+                  $userAnswer = UserController::ShowUsersController($itemUser, $valueUser);
 
-        $itemCustomer = "id";
-        $valueCustomer = $value["idCustomer"];
+                  echo '<td>'.$userAnswer["name"].'</td>
 
-        $customerAnswer = CustomerController::ShowCustomerController($itemCustomer, $valueCustomer);
+                  <td>'.$value["tableNo"].'</td>';
 
-        echo '<td>'.$customerAnswer["name"].'</td>
+                  $itemCustomer = "idNumber";
+                  $valueCustomer = $value["idCustomer"];
+                  
+                  $customerAnswer = CustomerController::ShowCustomerController($itemCustomer, $valueCustomer);
 
-        <td>$ '.number_format($value["netPrice"],2).'</td>
+                  echo '<td>'.$customerAnswer["name"].'</td>
 
-        <td>'.$value["discount"].'</td>
+                  <td>$ '.number_format($value["netPrice"],2).'</td>
 
-        <td>$ '.number_format($value["totalPrice"],2).'</td>
+                  <td>'.$value["discount"].'</td>
 
-        <td>'.$value["paymentMethod"].'</td>
+                  <td>$ '.number_format($value["totalPrice"],2).'</td>
 
-        <td>'.$value["saledate"].'</td>
+                  <td>'.$value["paymentMethod"].'</td>
 
-        <td>
+                  <td>'.$value["saledate"].'</td>
 
-          <div class="btn-group">
-              
-            <div class="btn-group">
-              
-            <button class="btn btn-info btnPrintBill" saleCode="'.$value["code"].'">
+                  <td>
 
-              <i class="fa fa-print"></i>
+                    <div class="btn-group">
+                        
+                      <div class="btn-group">
+                        
+                        <button class="btn btn-info btnPrintBill" saleCode="'.$value["code"].'">
 
-            </button>';
+                          <i class="fa fa-print"></i>
 
-               echo '<button class="btn btn-warning btnReopenSale" idSale="'.$value["id"].'"><i class="fa fa-pencil"></i></button>
+                        </button>
+                        
+                        <button class="btn btn-warning btnReopenSale" idSale="'.$value["id"].'"><i class="fa fa-pencil"></i></button>';
 
-                <button class="btn btn-danger btnDeleteSale" idSale="'.$value["id"].'"><i class="fa fa-times"></i></button>';
+                        if ($_SESSION["profile"] == "administrator") {
 
-         echo '</div>  
+                        echo '<button class="btn btn-danger btnDeleteSale" idSale="'.$value["id"].'"><i class="fa fa-times"></i></button>';
 
-        </td>
+                        }
 
-      </tr>';
-  }
+                        echo '</div>  
 
-?>
-                    
-                    </tbody>
+                      </td>
 
-        </table>
+                    </tr>';
+                    }
 
-        <?php
+                  ?>
+                              
+                </tbody>
 
-          $deleteSale = new SalesController();
-          $deleteSale -> DeleteSaleController();
+              </table>
 
-          ?>
+              <?php
+
+              $deleteSale = new SalesController();
+              $deleteSale -> DeleteSaleController();
+
+              ?>
 
       </div>
     

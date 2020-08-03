@@ -1,10 +1,20 @@
 <?php
 
-class ControllerUsers{
+/**
+ * Class UserController
+ * UserLogin, creation, displaying ,editing and deletion of users
+ */
+class UserController{
 
 	// User Login
-	
-	public static function UserLogin(){
+	/**
+	 * Checks if the user login credentials are correct and dont have special chars
+	 * then logs the user in
+	 * If user account is deactivated tell the user account is deactivated
+	 * else tell user that the User/Password is incorrect
+	 * @return void
+	 */
+	public static function UserLoginController(){
 
 		if (isset($_POST["loginUser"])) {
 			
@@ -18,7 +28,7 @@ class ControllerUsers{
 
 				$crypt = crypt($_POST["loginPassword"], '$2a$07$asxx54ahjppf45sd87a5a4dDDGsystemdev$');
 
-				$answer = UserModel::ModelShowUsers($table, $item, $value);
+				$answer = UserModel::ShowUsersModel($table, $item, $value);
 
 				if($answer["user"] == $_POST["loginUser"] && $answer["password"] == $crypt){
 
@@ -49,7 +59,7 @@ class ControllerUsers{
 					
 						echo '<script>
 
-							window.location = "dashboard";
+							window.location = "till";
 
 						</script>';
 
@@ -68,7 +78,18 @@ class ControllerUsers{
 		}
 	}
 
-	public function CreateUser(){
+	// Create User
+	/**
+	 * If the post variable is set to newUser and then check if the new Name/User/Password are valid characters
+	 * go to the users table hash the new password and input the users data unto the table.
+	 * Send success message to the user that new user was added.
+	 * 
+	 * else send error message telling the user that there was an error, fill in all fields making sure there are
+	 * no special characters allowed.
+	 * 
+	 * @return void
+	 */
+	public static function CreateUserController(){
 
 		if (isset($_POST["newUser"])) {
 			
@@ -85,7 +106,7 @@ class ControllerUsers{
 							  'password' => $crypt,
 							  'profile' => $_POST["newProfile"]);
 
-				$answer = UserModel::modelAddUser($table, $data);
+				$answer = UserModel::AddUserModel($table, $data);
 
 				if ($answer == 'ok') {
 
@@ -93,7 +114,7 @@ class ControllerUsers{
 						
 						swal({
 							type: "success",
-							title: "User Added Succesfully!",
+							title: "User Added Successfully!",
 							showConfirmButton: true,
 							confirmButtonText: "Close"
 
@@ -136,16 +157,32 @@ class ControllerUsers{
 	}
 
 	// Show Users
-	public static function ShowUsers($item, $value){
+	/**
+	 * fetches user table from database 
+	 * and displays the contents
+	 * 
+	 * @param mixed $item
+	 * @param mixed $value
+	 * 
+	 * @return void
+	 */
+	public static function ShowUsersController($item, $value){
 
 		$table = "users";
 
-		$answer = UserModel::ModelShowUsers($table, $item, $value);
+		$answer = UserModel::ShowUsersModel($table, $item, $value);
 
 		return $answer;
 	}
 
 	// Edit User
+	/**
+	 * fetches the user details from table 
+	 * and chanages them according to what was entered
+	 * if invalid characters are input error message will be sent
+	 * else user will be edited
+	 * @return void
+	 */
 	public static function EditUserController(){
 
 		if (isset($_POST["EditUser"])) {
@@ -195,7 +232,7 @@ class ControllerUsers{
 								'password' => $encryptpassword,
 								'profile' => $_POST["EditProfile"]);
 
-				$answer = UserModel::ModelEditUser($table, $data);
+				$answer = UserModel::EditUserModel($table, $data);
 
 				if ($answer == 'ok') {
 					
@@ -203,7 +240,7 @@ class ControllerUsers{
 					
 						swal({
 							type: "success",
-							title: "User Edited Succesfully!",
+							title: "User Edited Successfully!",
 							showConfirmButton: true,
 							confirmButtonText: "Close"
 
@@ -246,7 +283,11 @@ class ControllerUsers{
 	}
 
 	// Delete User
-
+	/**
+	 * fetches the user id from the table
+	 * then deletes the user
+	 * @return void
+	 */
 	public static function DeleteUserController(){
 
 		if(isset($_GET["userId"])){

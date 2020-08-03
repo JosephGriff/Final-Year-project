@@ -4,19 +4,28 @@
 require_once "../controllers/users.controller.php";
 require_once "../models/users.model.php";
 
+/**
+ * Class AjaxUsers
+ */
 class AjaxUsers{
 
 	// Edit User
-
+	/**
+	 * @var undefined
+	 */
 	public $idUser;
 
+	/**
+	 * uses the user id to find users to edit
+	 * @return void
+	 */
 	public function EditUserAjax(){
 
         $item = "id";
         
 		$value = $this->idUser;
 
-		$answer = ControllerUsers::ShowUsers($item, $value);
+		$answer = UserController::ShowUsersController($item, $value);
 
 		echo json_encode($answer);
 
@@ -25,9 +34,19 @@ class AjaxUsers{
 
 	// Activate or Deactivate User
 
+	/**
+	 * @var undefined
+	 */
 	public $activateUser;
+	/**
+	 * @var undefined
+	 */
 	public $activateId;	
 
+	/**
+	 * updates the table by activating users
+	 * @return void
+	 */
 	public function ActivateUserAjax(){
 
 		$table = "users";
@@ -39,24 +58,27 @@ class AjaxUsers{
 
 		$answer = UserModel::UpdateUserModel($table, $item1, $value1, $item2, $value2);
 
-		//console.log("answer", answer);
-
 	}
 
 	// Duplicate Username Validation
-
+	
+	/**
+	 * @var undefined
+	 */
 	public $validateUser;
 
+	/**
+	 * validayes the user 
+	 * @return void
+	 */
 	public function ValidateUserAjax(){
 
 		$item = "user";
 		$value = $this->validateUser;
 
-		$answer = ControllerUsers::ShowUsers($item, $value);
+		$answer = UserController::ShowUsersController($item, $value);
 
 		echo json_encode($answer);
-
-		//console.log("answer", answer);
 
 	}
 
@@ -64,7 +86,6 @@ class AjaxUsers{
 
 
 // Edit User
-
 if (isset($_POST["idUser"])) {
 
 	$edit = new AjaxUsers();
@@ -73,7 +94,6 @@ if (isset($_POST["idUser"])) {
 }
 
 // Activate or Deactivate User
-
 if (isset($_POST["activateUser"])) {
 
 	$activateUser = new AjaxUsers();
@@ -83,7 +103,6 @@ if (isset($_POST["activateUser"])) {
 }
 
 // Duplicate Username Validation
-
 if (isset($_POST["validateUser"])) {
 
 	$valUser = new AjaxUsers();
